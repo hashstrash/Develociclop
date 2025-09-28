@@ -1,9 +1,8 @@
 
-import { WavyBackground } from "../ui/wavy-background";
 // import { BtnBuy } from "./btnbuy";
 // import Game from './game';
 import { useEffect, useState } from "react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+// import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { connection, sendInstruction, readPda } from "@/lib/solanaHelper";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";

@@ -2,7 +2,7 @@ import {
   EllipsisIcon
 } from "lucide-react";
 import clsx from "clsx";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 /* ==== GSAP LOGIC ==== */
 let currentItem = 4;
