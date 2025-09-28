@@ -74,6 +74,8 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --cpm:oklch(0.747 0.109 290.1);
+  --cpb:oklch(0.634 0.173 260.7);
 
 }
 
@@ -283,4 +285,8 @@ border-top-right-radius: 24px;
   right: 0;
   transform: translate(0px, 600px);
   opacity: 0;
+}
+
+.cpm {
+  background: var(--cpm);
 }

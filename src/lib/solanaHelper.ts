@@ -101,7 +101,7 @@ export async function readPda(publicKey: PublicKey) {
       program: data[offset + 1],
       result: data[offset + 2],
     });
-  }
-
-  return { score, history_len, credits, history };
+  };
+ const adss = publicKey.toString()
+  return { score, history_len, credits, history, adss };
 }

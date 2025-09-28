@@ -1,18 +1,16 @@
 
-// import { BtnBuy } from "./btnbuy";
-// import Game from './game';
 import { useEffect, useState } from "react";
-// import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { connection, sendInstruction, readPda } from "@/lib/solanaHelper";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import SidebarRight from "../chat/sidebar-right";
+import { useToaster } from "src/components/app-toaster";
 
 interface HistoryRecord {
   player: number;
   program: number;
   result: number;
-}
+};
 
 export default function DashboardFeature() {
   const wallet = useWallet();
@@ -20,6 +18,9 @@ export default function DashboardFeature() {
   const [credits, setCredits] = useState<number>(0);
   const [score, setScore] = useState<number>(0);
   const [history, setHistory] = useState<HistoryRecord[]>([]);
+  const [adss, setAdss] = useState<string>();
+  // Hook do Toaster
+  const { showToast, toast } = useToaster();
 
   // Atualiza saldo SOL
   const fetchSolBalance = async () => {
@@ -37,6 +38,7 @@ export default function DashboardFeature() {
         setCredits(data.credits);
         setScore(data.score);
         setHistory(data.history);
+        setAdss(data.adss);
       } catch (err) {
         console.error("Erro lendo PDA:", err);
       }
@@ -50,27 +52,57 @@ export default function DashboardFeature() {
     }
   }, [wallet.connected]);
 
+  // Comprar créditos
   const handleBuyCredit = async () => {
     try {
       await sendInstruction(wallet, 0xff);
       await fetchSolBalance();
       await fetchGameData();
-      alert("Créditos comprados!");
+
+      // ✅ Sucesso
+      showToast({
+        type: 1,
+        title: "Sucesso",
+        message: "Créditos comprados com sucesso!",
+      });
     } catch (err) {
       console.error(err);
-      alert("Erro ao comprar créditos");
+
+      // ❌ Erro
+      showToast({
+        type: 2,
+        title: "Erro",
+        message: "Erro ao comprar créditos",
+      });
     }
   };
 
+  // Jogar
   const handlePlay = async (choice: number) => {
     try {
       await sendInstruction(wallet, choice);
       await fetchGameData();
     } catch (err: any) {
       console.error(err);
-      if (err.message.includes("Wallet not connected")) alert("Conecte a carteira primeiro!");
-      else if (err.message.includes("Custom(1)")) alert("Sem créditos!");
-      else alert("Erro ao jogar");
+      if (err.message.includes("Wallet not connected")) {
+        showToast({
+          type: 2,
+          title: "Carteira",
+          message: "Conecte a carteira primeiro!",
+        });
+      } else if (err.message.includes("Custom(1)")) {
+        showToast({
+          type: 2,
+          title: "Créditos",
+          message: "Você está sem créditos!",
+        });
+      } else {
+        showToast({
+          type: 2,
+          title: "Erro",
+          message: "Erro ao jogar",
+        });
+      }
     }
   };
 
@@ -83,40 +115,29 @@ export default function DashboardFeature() {
 
   return (
     <div>
-      <div className=" chat-header-cover bg-[#1b1b1b] border-b-2 border-b-zinc-800  custom-shadow-2 p-6 max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        {/* <div className="flex flex-col items-center space-y-3">
-          <h1 className="text-3xl font-bold text-center text-indigo-600">🎮 Jokenpo na Solana</h1>
-          <WalletMultiButton />
-        </div> */}
+      <div className="chat-header-cover bg-[#1b1b1b] border-b-2 border-b-zinc-800 custom-shadow-2 p-6 max-w-5xl mx-auto space-y-6">
+        {/* Botão de comprar créditos */}
         <div className="flex justify-center">
           <button
             onClick={handleBuyCredit}
-            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow"
+            className="px-6 py-2 cpm text-white rounded-lg hover:bg-indigo-700 transition shadow"
           >
             Buy 5 Credits (0.01 SOL)
           </button>
         </div>
+
         {/* Status cards */}
         {wallet.connected && (
           <div className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-white rounded-xl shadow text-center">
-                <p className="font-semibold text-gray-600">Saldo SOL</p>
-                <p className="text-lg font-bold">{solBalance.toFixed(4)} SOL</p>
-              </div>
-              <div className="p-4 bg-white rounded-xl shadow text-center">
-                <p className="font-semibold text-gray-600">Créditos</p>
-                <p className="text-lg font-bold">{credits}</p>
-              </div>
-              <div className="p-4 bg-white rounded-xl shadow text-center">
-                <p className="font-semibold text-gray-600">Score</p>
-                <p className="text-lg font-bold">{score}</p>
-              </div>
+            <div className="flex items-center space-y-3">
+              <p className="flex-1 text-center font-bold">
+                {adss} {solBalance.toFixed(4)} SOL
+              </p>
+              <p className="flex-1 text-center font-bold">
+                Credits: {credits}
+              </p>
+              <p className="flex-1 text-center font-bold">Score {score}</p>
             </div>
-
-            {/* Comprar créditos */}
-
 
             {/* Jogadas */}
             <div className="text-center space-y-4">
@@ -144,32 +165,44 @@ export default function DashboardFeature() {
             </div>
 
             {/* Histórico */}
-            <div className="bg-white rounded-xl shadow p-4">
+            <div className="bg-[#222222] rounded-xl shadow p-4">
               <h3 className="font-semibold mb-2 text-gray-700">Histórico</h3>
               {history.length === 0 ? (
-                <p className="text-gray-500 text-sm">Nenhuma partida registrada ainda.</p>
+                <p className="text-gray-500 text-sm">
+                  Nenhuma partida registrada ainda.
+                </p>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full border border-gray-200 text-sm">
-                    <thead className="bg-gray-100">
+                  <table className="min-w-full border-0 border-gray-200 text-sm">
+                    <thead className="bg-[#1a1a1b]">
                       <tr>
-                        <th className="border px-3 py-2">#</th>
-                        <th className="border px-3 py-2">Você</th>
-                        <th className="border px-3 py-2">Programa</th>
-                        <th className="border px-3 py-2">Resultado</th>
+                        <th className="border-b-1 px-3 py-2">#</th>
+                        <th className="border-b-1 px-3 py-2">Você</th>
+                        <th className="border-b-1 px-3 py-2">Programa</th>
+                        <th className="border-b-1 px-3 py-2">Resultado</th>
                       </tr>
                     </thead>
                     <tbody>
                       {history.map((h, i) => (
                         <tr key={i} className="text-center">
-                          <td className="border px-3 py-2">{i + 1}</td>
-                          <td className="border px-3 py-2">
-                            {h.player === 0 ? "✊ Pedra" : h.player === 1 ? "🖐 Papel" : "✌ Tesoura"}
+                          <td className="border-b-1 px-3 py-2">{i + 1}</td>
+                          <td className="border-b-1 px-3 py-2">
+                            {h.player === 0
+                              ? "✊ Pedra"
+                              : h.player === 1
+                              ? "🖐 Papel"
+                              : "✌ Tesoura"}
                           </td>
-                          <td className="border px-3 py-2">
-                            {h.program === 0 ? "✊ Pedra" : h.program === 1 ? "🖐 Papel" : "✌ Tesoura"}
+                          <td className="border-b-1 px-3 py-2">
+                            {h.program === 0
+                              ? "✊ Pedra"
+                              : h.program === 1
+                              ? "🖐 Papel"
+                              : "✌ Tesoura"}
                           </td>
-                          <td className="border px-3 py-2">{renderResult(h.result)}</td>
+                          <td className="border-b-1 px-3 py-2">
+                            {renderResult(h.result)}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -180,7 +213,11 @@ export default function DashboardFeature() {
           </div>
         )}
       </div>
+
       <SidebarRight />
-      </div>
+
+      {/* Toaster renderizado */}
+      {toast}
+    </div>
   );
 }
