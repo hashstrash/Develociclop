@@ -5,6 +5,7 @@ import { connection, sendInstruction, readPda } from "@/lib/solanaHelper";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import SidebarRight from "../chat/sidebar-right";
 import { useToaster } from "src/components/app-toaster";
+// import HeroMain from "./heromain";
 
 interface HistoryRecord {
   player: number;
@@ -114,21 +115,15 @@ export default function DashboardFeature() {
   };
 
   return (
-    <div>
-      <div className="chat-header-cover bg-[#1b1b1b] border-b-2 border-b-zinc-800 custom-shadow-2 p-6 max-w-5xl mx-auto space-y-6">
-        {/* Botão de comprar créditos */}
-        <div className="flex justify-center">
-          <button
-            onClick={handleBuyCredit}
-            className="px-6 py-2 cpm text-white rounded-lg hover:bg-indigo-700 transition shadow"
-          >
-            Buy 5 Credits (0.01 SOL)
-          </button>
-        </div>
-
-        {/* Status cards */}
+    <> 
         {wallet.connected && (
+           <div className="chat-header-cover bg-[#1b1b1b] border-b-2 border-b-zinc-800 custom-shadow-2 p-6 max-w-5xl mx-auto space-y-6">
           <div className="space-y-8">
+            <div className="flex justify-center">
+              <button onClick={handleBuyCredit} className="px-6 py-2 cpm text-white rounded-lg hover:bg-indigo-700 transition shadow">
+                Buy 5 Credits (0.01 SOL)
+              </button>
+            </div>
             <div className="flex items-center space-y-3">
               <p className="flex-1 text-center font-bold">
                 {adss} {solBalance.toFixed(4)} SOL
@@ -190,15 +185,15 @@ export default function DashboardFeature() {
                             {h.player === 0
                               ? "✊ Pedra"
                               : h.player === 1
-                              ? "🖐 Papel"
-                              : "✌ Tesoura"}
+                                ? "🖐 Papel"
+                                : "✌ Tesoura"}
                           </td>
                           <td className="border-b-1 px-3 py-2">
                             {h.program === 0
                               ? "✊ Pedra"
                               : h.program === 1
-                              ? "🖐 Papel"
-                              : "✌ Tesoura"}
+                                ? "🖐 Papel"
+                                : "✌ Tesoura"}
                           </td>
                           <td className="border-b-1 px-3 py-2">
                             {renderResult(h.result)}
@@ -211,13 +206,10 @@ export default function DashboardFeature() {
               )}
             </div>
           </div>
+           </div>
         )}
-      </div>
-
       <SidebarRight />
-
-      {/* Toaster renderizado */}
       {toast}
-    </div>
+    </>
   );
 }
