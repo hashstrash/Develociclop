@@ -5,7 +5,6 @@ import React from 'react'
 // import { AppFooter } from '@/components/app-footer'
 import { ClusterChecker } from '@/components/cluster/cluster-ui'
 import { AccountChecker } from '@/components/account/account-ui'
-import HeroMain from './dashboard/heromain'
 
 export function AppLayout({
   children,
@@ -16,10 +15,9 @@ export function AppLayout({
 }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen p-0">
         <AppHeader links={links} />
-        <HeroMain />
-        <main className="flex-grow container mx-auto p-0 ">
+        <main className="flex-grow container mx-auto p-4">
           <ClusterChecker>
             <AccountChecker />
           </ClusterChecker>

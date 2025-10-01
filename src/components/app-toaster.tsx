@@ -1,5 +1,5 @@
 import { useState, ReactNode } from "react";
-import { Toaster } from "./ui/Toaster";
+import { Toaster } from "./ui/toast";
 
 interface ToastOptions {
   type: 1 | 2 | 3;
